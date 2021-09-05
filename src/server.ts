@@ -30,10 +30,20 @@ import { response } from 'express';
 
   /**************************************************************************** */
 
-  app.get("/filteredimage", async (req, res) => {
-    res.json({
-      message: "We got here"
-    })
+  // Get the path for an image
+  app.get(`/filteredimage`, async (req: Request, res: Response): Promise<any> => {
+    let imageUrl = req.query.image_url;
+    if (!imageUrl) {
+      return res
+        .status(400)
+        .json({
+          message: "Invalid url"
+        })
+    }
+    imageUrl = imageUrl.toString();
+    const imageURL = await filterImageFromURL(imageUrl);
+    res.sendFile(imageURL);
+    res.on('finish', () => deleteLocalFiles([imageURL]));
   })
 
   //! END @TODO1
