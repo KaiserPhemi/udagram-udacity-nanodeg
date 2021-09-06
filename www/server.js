@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const util_1 = require("./util/util");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     // Init the Express application
     const app = express_1.default();
@@ -35,10 +36,20 @@ const body_parser_1 = __importDefault(require("body-parser"));
     // RETURNS
     //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
     /**************************************************************************** */
-    app.get("/filteredimage", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        res.json({
-            message: "We got here"
-        });
+    // Get the path for an image
+    app.get(`/filteredimage`, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        let imageUrl = req.query.image_url;
+        if (!imageUrl) {
+            return res
+                .status(400)
+                .json({
+                message: "Invalid url"
+            });
+        }
+        imageUrl = imageUrl.toString();
+        const imageURL = yield util_1.filterImageFromURL(imageUrl);
+        res.sendFile(imageURL);
+        res.on('finish', () => util_1.deleteLocalFiles([imageURL]));
     }));
     //! END @TODO1
     // Root Endpoint

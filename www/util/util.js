@@ -24,15 +24,22 @@ const Jimp = require("jimp");
 //    an absolute path to a filtered image locally saved file
 function filterImageFromURL(inputURL) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            const photo = yield Jimp.read(inputURL);
-            const outpath = '/tmp/filtered.' + Math.floor(Math.random() * 2000) + '.jpg';
-            yield photo
-                .resize(256, 256) // resize
-                .quality(60) // set JPEG quality
-                .greyscale() // set greyscale
-                .write(__dirname + outpath, (img) => {
-                resolve(__dirname + outpath);
+        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            // const photo = await Jimp.read(inputURL);
+            Jimp.read(inputURL)
+                .then(photo => {
+                const outpath = '/tmp/filtered.' + Math.floor(Math.random() * 2000) + '.jpg';
+                photo
+                    .resize(256, 256) // resize
+                    .quality(60) // set JPEG quality
+                    .greyscale() // set greyscale
+                    .write(__dirname + outpath, (img) => {
+                    resolve(__dirname + outpath);
+                });
+            })
+                .catch(err => {
+                console.log('Fatal Error: Image not found');
+                reject(err);
             });
         }));
     });
